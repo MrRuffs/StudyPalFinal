@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+.flashcard-container {
+    perspective: 1000px;
+    max-width: 77%;
+    margin: 2rem auto;
+    font-family: "Montserrat", sans-serif;
+}
+
+.flashcard {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+    border-radius: 10px;
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+    margin-top: -20px;
+}
+
+.flashcard.flipped {
+    transform: rotateX(180deg); /* Horizontal flip */
+}
+
+.flashcard-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    border-radius: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.flashcard-front {
+    transform: rotateX(0deg); /* No rotation for front */
+}
+
+.flashcard-back {
+    transform: rotateX(180deg); /* Horizontal flip for back */
+}
+
+.flashcard-question, .flashcard-answer {
+    font-size: 1.5rem;
+    text-align: center;
+    color: #333;
+}
+
+.flashcard-question {
+    font-weight: bold;
+}
+
+.flashcard-answer {
+    color: #555;
+}
+
+.navigation-buttons .btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-incorrect {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-nearly {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-correct {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-incorrect:hover {
+    background-color: #c82333;
+}
+
+.btn-nearly:hover {
+    background-color: #e0a800;
+}
+
+.btn-correct:hover {
+    background-color: #218838;
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.progress-badge {
+    font-weight: bold;
+    font-family: "Montserrat", sans-serif;
+    max-width: 300px;
+    width: 90%
+}
+
+.top-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#indicator {
+    font-size: 20px;
+    /* font-weight: bold; */
+}
+
+.btn-back-flashcard {
+    margin-top: 25px;
+}
+
+.flashcard-content hr {
+    border: 0;
+    height: 1px;
+    background: #000; /* Light gray line */
+    margin: 1rem 0; /* Adjust spacing as needed */
+}
+
+.flashcard {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing */
+}
+
+.flashcard-face {
+    overflow-y: auto; /* Add scrollbar if content overflows */
+    max-height: 600px; /* Set a maximum height */
+    scroll-behavior: smooth;
+}

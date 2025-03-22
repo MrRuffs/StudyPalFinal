@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css//home.css">
+    <link rel="stylesheet" href="/static/css/footer.css">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .welcome-section {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+        .btn-custom {
+            margin: 0.5rem;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 10px;
+        }
+        .btn-study {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-create {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-generate {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown-menu {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .subject-item, .deck-item {
+            cursor: pointer;
+        }
+        .deck-item {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">StudyPal</a>
+            <div class="navbar-nav">
+                <button id="sign-out-button" class="btn btn-outline-light">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container text-center mt-5">
+        <div class="welcome-section">
+            <h1 class="display-4">Hello, <span id="username" class="text-primary">User</span>!</h1>
+            <p class="lead">Welcome to StudyPal.</p>
+            <hr class="my-4">
+            <h3>What would you like to do today?</h3>
+            <div class="mt-4 d-flex flex-column gap-3" style="align-items: center;">
+                <!-- Button to Create a Subject -->
+                <button style="width: 200px" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSubjectModal">
+                    Create Subject
+                </button>
+            
+                <!-- Button to Generate AI Flashcards -->
+                <a href="/generate-flashcards-page" style="color: white; width: 200px" class="btn btn-info">Generate AI Flashcards</a>
+            </div>
+
+            <!-- Subject Cards -->
+            <div class="row mt-4" id="subjectCards">
+                <!-- Subject cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-white border-top">
+        <div class="container text-center">
+            <span class="text-muted">2025 StudyPal. Created by Ibrahim Rahman.</span>
+        </div>
+    </footer>
+
+
+    <!-- Modals -->
+
+    <!-- Create Subject Modal -->
+    <div class="modal fade" id="createSubjectModal" tabindex="-1" aria-labelledby="createSubjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createSubjectModalLabel">Create Subject</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createSubjectForm">
+                        <div class="mb-3">
+                            <label for="subjectName" class="form-label">Subject Name</label>
+                            <input type="text" class="form-control" id="subjectName" required>
+                        </div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Deck Modal -->
+    <div class="modal fade" id="createDeckModal" tabindex="-1" aria-labelledby="createDeckModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createDeckModalLabel">Create Deck</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createDeckForm">
+                        <div class="mb-3">
+                            <label for="deckName" class="form-label">Deck Name</label>
+                            <input type="text" class="form-control" id="deckName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subjectForDeck" class="form-label">Select Subject</label>
+                            <select class="form-select" id="subjectForDeck" required>
+                                <!-- Subjects will be dynamically inserted here -->
+                            </select>
+                        </div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Flashcard Modal -->
+    <div class="modal fade" id="addFlashcardModal" tabindex="-1" aria-labelledby="addFlashcardModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFlashcardModalLabel">Add Flashcards</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addFlashcardForm">
+                        <div id="flashcardInputs">
+                            <!-- Flashcard inputs will be dynamically added here -->
+                            <div class="flashcard-input mb-3">
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" class="form-control" placeholder="Question" required>
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control" placeholder="Answer" required>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeFlashcardInput(this)">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addFlashcardInput()">Add Another Flashcard</button>
+                        <div class="mt-3">
+                            <label for="deckForFlashcard" class="form-label">Select Deck</label>
+                            <select class="form-select" id="deckForFlashcard" required>
+                                <!-- Decks will be dynamically inserted here -->
+                            </select>
+                        </div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Decks Modal -->
+    <div class="modal fade" id="viewDecksModal" tabindex="-1" aria-labelledby="viewDecksModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDecksModalLabel">Decks in <span id="subjectNameInModal"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Create Deck Form -->
+                    <form id="createDeckFormInModal">
+                        <div class="mb-3">
+                            <!-- <label for="deckNameInModal" class="form-label">Deck Name</label> -->
+                            <input type="text" placeholder="Deck name..." class="form-control" id="deckNameInModal" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Deck</button>
+                    </form>
+
+                    <!-- Decks List -->
+                    <div id="decksList" class="mt-4">
+                        <!-- Decks will be dynamically inserted here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmationMessage">Are you sure you want to delete this item?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/home.js"></script>
+</body>
+</html>
