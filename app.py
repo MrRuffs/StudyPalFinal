@@ -14,12 +14,10 @@ from ai.generate_ai_flashcards import generate_flashcards_api
 
 load_dotenv()
 
-
-
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests
 app.secret_key = os.getenv("SECRET_KEY")  # Replace with a real secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Flask session secret key
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')  # JWT secret key
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=365 * 10)  # 10 years
