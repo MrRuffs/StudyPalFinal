@@ -136,3 +136,56 @@
     max-height: 600px; /* Set a maximum height */
     scroll-behavior: smooth;
 }
+
+/* Animation for sliding out the current flashcard */
+@keyframes slideOut {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+/* Animation for sliding in the next flashcard */
+@keyframes slideIn {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Apply the animations to the flashcard container */
+.flashcard-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.flashcard {
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.slide-out {
+    animation: slideOut 0.5s ease forwards;
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease forwards;
+}
+
+/* Ensure the confetti appears above the flashcard */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through */
+    z-index: 1000;
+}
