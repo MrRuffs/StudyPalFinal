@@ -89,7 +89,7 @@ function displayFlashcards(flashcards) {
     }
 }
 
-function showAlertModal(message) {
+function showAlertModal(message, condition) {
     // Set the message in the modal
     document.getElementById('alertMessage').innerText = message;
 
@@ -100,7 +100,9 @@ function showAlertModal(message) {
     // Listen for the modal's hidden event
     document.getElementById('alertModal').addEventListener('hidden.bs.modal', function () {
         // Redirect to the home page
-        window.location.href = "/home";
+        if (condition) {
+            window.location.href = "/home";
+        }
     });
 }
 
@@ -133,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (!responseData.decks_exist) {
             // If no decks exist, show the alert modal
-            showAlertModal("No decks found. Please create a deck first.");
+            showAlertModal("No decks found. Please create a deck first.", true);
         }
     } catch (error) {
         console.error("Error checking decks:", error);
@@ -299,5 +301,5 @@ function handleDiscard() {
     if (approvalButtons) {
         approvalButtons.style.display = "none";
     }
-    alert("Flashcards discarded.");
+    showAlertModal("Flashcards discarded.", false);
 }
