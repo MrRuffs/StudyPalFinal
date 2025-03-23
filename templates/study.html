@@ -23,7 +23,7 @@
             </div>
             <div class="card-body text-center" >
                 <div class="top-items">
-                    <span id="btn-count" class="progress-badge badge bg-primary fs-6 mb-3">Flashcard 1 of 10</span>
+                    <span id="btn-count" style="color: #107ab0">Flashcard 1 of 10</span>
                     <span id="indicator">Question</span>
                 </div>
 
@@ -31,7 +31,7 @@
                     <div class="flashcard" id="flashcard" onclick="flipCard()">
                         <div class="flashcard-face flashcard-front">
                             <div class="flashcard-content" style="text-align: center; align-items: center;">
-                                <div class="flashcard-question" id="flashcardQuestion">What is the capital of France?</div>
+                                <div class="flashcard-question" id="flashcardQuestion">Question loading...</div>
                                 <!-- <hr> -->
                                 <a style="display: none;" class="btn btn-primary" onclick="backToDeck()" id="backButton">Back to Deck?</a>
                             </div>
@@ -41,7 +41,7 @@
                                 <!-- Display the question above the answer -->
                                 <!-- <div class="flashcard-question" id="flashcardQuestionBack">What is the capital of France?</div> -->
                                 <!-- <hr class="my-2"> Horizontal line as a separator -->
-                                <div class="flashcard-answer" id="flashcardAnswer">Paris</div>
+                                <div class="flashcard-answer" id="flashcardAnswer">Answer...</div>
                             </div>
                         </div>
                         
@@ -58,13 +58,13 @@
                 <div class="card-footer bg-white">
                     <div style="margin-top: 15px" class="d-flex flex-wrap justify-content-center gap-3" styl>
                         <button class="btn btn-danger px-4 py-2" id="incorrectButton" onclick="rateFlashcard('learning')" disabled>
-                            <i class="bi bi-x-circle"></i> Incorrect
+                            <i class="bi bi-x-circle"></i> Learning
                         </button>
                         <button class="btn btn-warning px-4 py-2 text-white" id="nearlyButton" onclick="rateFlashcard('nearly')" disabled>
                             <i class="bi bi-question-circle"></i> Nearly
                         </button>
                         <button class="btn btn-success px-4 py-2" id="correctButton" onclick="rateFlashcard('learned')" disabled>
-                            <i class="bi bi-check-circle"></i> Correct
+                            <i class="bi bi-check-circle"></i> Learned
                         </button>
                     </div>
                 </div>
@@ -258,18 +258,37 @@
                 // Rest of your existing code...
             }
         }
-        // Function to rate the flashcard and move to the next card
         async function rateFlashcard(rating) {
             console.log(`Flashcard rated as: ${rating}`);
             const access_token = localStorage.getItem('token');
             const flashcard_id = flashcards.flashcards[currentFlashcardIndex][0];
-    
+
             if (!access_token) {
                 console.error("No access token found. Please log in.");
                 return;
             }
 
             try {
+                // Flip the card back to the front before showing the next flashcard
+                if (isFlipped) {
+                    flipCard();
+                }
+
+                // Add slide-out animation to the current flashcard
+                const flashcardElement = document.getElementById("flashcard");
+                flashcardElement.classList.add("slide-out");
+
+                // Wait for the slide-out animation to finish
+                await new Promise((resolve) => setTimeout(resolve, 200)); // 500ms matches the animation duration
+
+                // Trigger confetti based on the rating
+                switch (rating) {
+                    case "learned":
+                        celebrate("green"); // Green confetti for "Learned" (most intense)
+                        break;
+                }
+
+                // Update the flashcard status on the server
                 const response = await fetch("/update-flashcard-status", {
                     method: "POST",
                     headers: {
@@ -282,55 +301,116 @@
                         status: rating
                     })
                 });
-    
+
                 if (!response.ok) {
-                    // Log the response status and message
                     const errorData = await response.json();
                     console.error("Server error:", errorData);
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-    
+
                 const responseData = await response.json();
-                showNextFlashcard();
                 console.log("Flashcard status updated successfully:", responseData);
-                return responseData; // Return the fetched flashcards
+
+                // Show the next flashcard
+                showNextFlashcard();
             } catch (error) {
                 console.error("Error updating flashcard status:", error);
                 showAlertModal("An error occurred while updating flashcard. Please try again.");
-                return null;
             }
-            
         }
-    
-        // Function to show the next flashcard
+        
+        
         function showNextFlashcard() {
-            if (isFlipped) {
-                // Check if the user has reached the end of the flashcards list
-                if (currentFlashcardIndex === flashcards.flashcards.length - 1) {
-                    // Display the completion message
-                    document.getElementById("completionMessage").style.display = "block";
-                    
-                    // Hide the flashcard
-                    document.getElementById("flashcard").style.display = "none";
-                    
-                    // Disable the navigation buttons
-                    document.getElementById("incorrectButton").disabled = true;
-                    document.getElementById("nearlyButton").disabled = true;
-                    document.getElementById("correctButton").disabled = true;
-                    return; // Exit the function
-                }
-
-                // Move to the next flashcard
-                currentFlashcardIndex = (currentFlashcardIndex + 1) % flashcards.flashcards.length;
-                updateFlashcard();
+            // Check if the user has reached the end of the flashcards list
+            if (currentFlashcardIndex === flashcards.flashcards.length - 1) {
+                // Display the completion message
+                document.getElementById("completionMessage").style.display = "block";
                 
-                flipCard(); // Reset the card to the front
+                // Hide the flashcard
+                document.getElementById("flashcard").style.display = "none";
+                
+                // Disable the navigation buttons
+                document.getElementById("incorrectButton").disabled = true;
+                document.getElementById("nearlyButton").disabled = true;
+                document.getElementById("correctButton").disabled = true;
+                return; // Exit the function
             }
+
+            // Move to the next flashcard
+            currentFlashcardIndex = (currentFlashcardIndex + 1) % flashcards.flashcards.length;
+
+            // Add slide-in animation to the next flashcard
+            const flashcardElement = document.getElementById("flashcard");
+            flashcardElement.classList.remove("slide-out");
+            flashcardElement.classList.add("slide-in");
+
+            // Update the content for the next flashcard
+            updateFlashcard();
+
+            // Remove the slide-in animation after it finishes
+            setTimeout(() => {
+                flashcardElement.classList.remove("slide-in");
+            }, 250); // 250ms matches the animation duration
         }
-    
+        function celebrate(color) {
+            const end = Date.now() + 1000; // 1 second of confetti
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+            // Map button colors to confetti colors and effects
+            const colorMap = {
+                red: { colors: ["#ff0000", "#ff6666"], particleCount: 30, gravity: 1.5 }, // Red for "Learning" (less intense)
+                yellow: { colors: ["#ffcc00", "#ffeb3b"], particleCount: 40, gravity: 1.2 }, // Yellow for "Nearly" (moderate intensity)
+                green: { colors: ["#00ff00", "#4caf50"], particleCount: 50, gravity: 1 } // Green for "Learned" (most intense)
+            };
+
+            const { colors, particleCount, gravity } = colorMap[color] || { colors: ["#000000"], particleCount: 30, gravity: 1 }; // Default to black if no color is matched
+
+            (function frame() {
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    colors,
+                    gravity, // Adjust gravity for different effects
+                    origin: { x: Math.random(), y: Math.random() - 0.2 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
         
         // Initialize the flashcards when the page loads
+        function celebrate(color) {
+            const end = Date.now() + 1000; // 1 second of confetti
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+            // Map button colors to confetti colors
+            const colorMap = {
+                red: ["#ff0000", "#ff6666"], // Red for "Learning"
+                yellow: ["#ffcc00", "#ffeb3b"], // Yellow for "Nearly"
+                green: ["#00ff00", "#4caf50"] // Green for "Learned"
+            };
+
+            const particleCount = 50;
+            const colors = colorMap[color] || ["#000000"]; // Default to black if no color is matched
+
+            (function frame() {
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    colors,
+                    origin: { x: Math.random(), y: Math.random() - 0.2 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
         initializeFlashcards(deck_id, quantity);
     </script>
+    <!-- Add this script to your HTML file -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </body>
 </html>
